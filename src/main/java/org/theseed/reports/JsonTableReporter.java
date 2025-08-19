@@ -21,7 +21,7 @@ public class JsonTableReporter extends BaseTableReporter {
 
     // FIELDS
     /** output print writer */
-    private PrintWriter writer;
+    private final PrintWriter writer;
     /** list of column headers */
     private List<String> colHeaders;
     /** TRUE if there is already an object in the output */
