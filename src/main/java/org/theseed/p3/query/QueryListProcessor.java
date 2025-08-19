@@ -120,7 +120,7 @@ public class QueryListProcessor extends BaseQueryTableReportProcessor {
 
     @Override
     protected void runQueryReport(BaseTableReporter reporter, CursorConnection p3, String table, String fieldString,
-            List<SolrFilter> queryFilters, int limit) throws Exception {
+            List<SolrFilter> queryFilters, long limit) throws Exception {
         try {
             // We must first initialize the report. The report contains all the columns from the input file plus
             // all the columns from the target table. We modify the target table column header to include the
@@ -139,10 +139,10 @@ public class QueryListProcessor extends BaseQueryTableReportProcessor {
             else
                 realFieldString = fieldString + "," + this.keyName;
             // This will track the number of results output. We use this to compute the limit for each sub-query.
-            int outCount = 0;
-            // Thes are statistics for logging.
-            int inCount = 0;
-            int batchCount = 0;
+            long outCount = 0;
+            // These are statistics for logging.
+            long inCount = 0;
+            long batchCount = 0;
             this.keysNotFound = 0;
             // The batch is built in here. We use a linked map so we can unroll it in input order.
             Map<String, List<String>> lineMap = new LinkedHashMap<>();
@@ -168,7 +168,7 @@ public class QueryListProcessor extends BaseQueryTableReportProcessor {
             // Process the residual batch.
             if (! lineMap.isEmpty() && outCount < limit) {
                 log.info("Processing final batch with {} lines.", lineMap.size());
-                outCount +=this.processQueryBatch(lineMap, reporter, p3, table, realFieldString, queryFilters, limit - outCount);
+                outCount += this.processQueryBatch(lineMap, reporter, p3, table, realFieldString, queryFilters, limit - outCount);
             }
             log.info("{} input lines processed, {} output lines written, {} keys not found.", inCount, outCount, this.keysNotFound);
         } finally {
@@ -191,10 +191,10 @@ public class QueryListProcessor extends BaseQueryTableReportProcessor {
      * 
      * @throws IOException 
      */
-    private int processQueryBatch(Map<String, List<String>> lineMap, BaseTableReporter reporter, CursorConnection p3,
-            String table, String fieldString, List<SolrFilter> filters, int limit) throws IOException {
+    private long processQueryBatch(Map<String, List<String>> lineMap, BaseTableReporter reporter, CursorConnection p3,
+            String table, String fieldString, List<SolrFilter> filters, long limit) throws IOException {
         // This will track the number of lines output.
-        int retVal = 0;
+        long retVal = 0;
         // First, we must run the query. We use the keyset from the line map.
         List<JsonObject> results = p3.getRecords(table, limit, lineMap.size(), this.keyName, lineMap.keySet(),
                 fieldString, filters);

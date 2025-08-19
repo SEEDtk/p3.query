@@ -35,8 +35,20 @@ public abstract class BaseTableReporter implements AutoCloseable {
                 return true;
             }
 
+        },
+        /** a JSON report */
+        JSON {
+            @Override
+            public BaseTableReporter createReporter(IParms processor, File file) throws IOException {
+                return new JsonTableReporter(processor, file);
+            }
+
+            @Override
+            public boolean supportsStdOut() {
+                return true;
+            }
         };
-        
+
         /**
          * Create a report writer of this type.
          * 

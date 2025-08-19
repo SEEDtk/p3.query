@@ -106,7 +106,7 @@ public abstract class BaseQueryTableReportProcessor extends BasicQueryProcessor 
 
     @Override
     final protected void runQuery(CursorConnection p3, String table, String fieldString, List<SolrFilter> queryFilters,
-            int limit) throws Exception {
+            long limit) throws Exception {
         // Create the report writer.
         try (BaseTableReporter reporter = this.outputFormat.createReporter(this, this.outputFile)) {
             // Produce the report.
@@ -128,6 +128,6 @@ public abstract class BaseQueryTableReportProcessor extends BasicQueryProcessor 
      * @throws Exception
      */
     protected abstract void runQueryReport(BaseTableReporter reporter, CursorConnection p3, String table,
-            String fieldString, List<SolrFilter> queryFilters, int limit) throws Exception;
+            String fieldString, List<SolrFilter> queryFilters, long limit) throws Exception;
 
 }

@@ -59,7 +59,7 @@ public abstract class BasicQueryProcessor extends BaseBvbrcProcessor {
 
     /** maximum number of results to return */
     @Option(name = "--limit", metaVar = "100",usage = "maximum number of results to return")
-    private int maxResults;
+    private long maxResults;
 
     /** equality filter */
     @Option(name = "--eq", metaVar = "<fieldName>,<value>", usage = "name of a table field followed by a value to match")
@@ -184,7 +184,7 @@ public abstract class BasicQueryProcessor extends BaseBvbrcProcessor {
      * 
      * @throws Exception 
      */
-    protected abstract void runQuery(CursorConnection p3, String table, String fieldString, List<SolrFilter> queryFilters, int limit) throws Exception;
+    protected abstract void runQuery(CursorConnection p3, String table, String fieldString, List<SolrFilter> queryFilters, long limit) throws Exception;
 
     /**
      * This is a convenience method so the subclass does not have to re-split the output field names.

@@ -62,7 +62,7 @@ public class QueryGetProcessor extends BaseQueryTableReportProcessor {
 
     @Override
     protected void runQueryReport(BaseTableReporter reporter, CursorConnection p3, String table, String fieldString,
-            List<SolrFilter> queryFilters, int limit) throws Exception {
+            List<SolrFilter> queryFilters, long limit) throws Exception {
         // Get the output field list.
         this.outputFields = this.getFieldNames();
         // Set up the output headers.
