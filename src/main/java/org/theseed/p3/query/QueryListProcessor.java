@@ -18,6 +18,7 @@ import org.theseed.p3api.KeyBuffer;
 import org.theseed.p3api.SolrFilter;
 import org.theseed.reports.BaseTableReporter;
 import org.theseed.utils.BaseQueryTableReportProcessor;
+
 import com.github.cliftonlabs.json_simple.JsonObject;
 
 /**
@@ -41,7 +42,7 @@ import com.github.cliftonlabs.json_simple.JsonObject;
  * -v   display more frequent log messages
  * -o   output file (if not STDOUT)
  * -i   input file (if not STDIN)
- * -b   batch size for queries (default 100)
+ * -b   batch size for queries (default 200)
  * 
  * --map      the name of the JSON file containing the BV-BRC data map (default is to use the default map)
  * --limit    maximum number of results to return (default 1 billion)
@@ -95,6 +96,7 @@ public class QueryListProcessor extends BaseQueryTableReportProcessor {
         this.keyName = null;
         this.keyCol = "1";
         this.inFile = null;
+        this.batchSize = 200;
     }
 
     @Override
@@ -123,7 +125,7 @@ public class QueryListProcessor extends BaseQueryTableReportProcessor {
             // We must first initialize the report. The report contains all the columns from the input file plus
             // all the columns from the target table. We modify the target table column header to include the
             // target table name.
-            List<String> headers = new ArrayList<String>();
+            List<String> headers = new ArrayList<>();
             Arrays.stream(this.inStream.getLabels()).forEach(x -> headers.add(x));
             String tableName = this.getTableName();
             this.getFieldNames().stream().forEach(x -> headers.add(tableName + "." + x));
@@ -143,7 +145,7 @@ public class QueryListProcessor extends BaseQueryTableReportProcessor {
             int batchCount = 0;
             this.keysNotFound = 0;
             // The batch is built in here. We use a linked map so we can unroll it in input order.
-            Map<String, List<String>> lineMap = new LinkedHashMap<String, List<String>>();
+            Map<String, List<String>> lineMap = new LinkedHashMap<>();
             // We use this iterator to loop through the input lines.
             Iterator<TabbedLineReader.Line> lineIter = this.inStream.iterator();
             while (lineIter.hasNext() && outCount < limit) {
@@ -199,14 +201,14 @@ public class QueryListProcessor extends BaseQueryTableReportProcessor {
         log.info("{} records found for {} keys.", results.size(), lineMap.size());
         // Sort the results by the key name. For each result, we extract the output fields into a list. This will
         // form the second part of each output line. This will hold the sorted results.
-        Map<String, List<List<String>>> resultMap = new HashMap<String, List<List<String>>>(lineMap.size() * 4 / 3 + 1);
+        Map<String, List<List<String>>> resultMap = new HashMap<>(lineMap.size() * 4 / 3 + 1);
         // We need the field names for the output fields.
         List<String> fieldNames = this.getFieldNames();
         for (JsonObject record : results) {
             // Get the key value from this record.
             String keyValue = KeyBuffer.getString(record, this.keyName);
             // Get the output fields for this record.
-            List<String> row = new ArrayList<String>(fieldNames.size());
+            List<String> row = new ArrayList<>(fieldNames.size());
             for (String fieldName : fieldNames)
                 row.add(KeyBuffer.getString(record, fieldName));
             // Put the formed line in the sort map.

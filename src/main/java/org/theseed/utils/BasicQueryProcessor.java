@@ -1,9 +1,6 @@
 package org.theseed.utils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,16 +9,10 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.theseed.basic.BaseProcessor;
 import org.theseed.basic.ParseFailureException;
-import org.theseed.p3api.BvbrcDataMap;
 import org.theseed.p3api.CursorConnection;
 import org.theseed.p3api.P3CursorConnection;
 import org.theseed.p3api.SolrFilter;
-
-import com.github.cliftonlabs.json_simple.JsonException;
 
 /**
  * This is the base class for BV-BRC query processors. It handles specification of the target table,
@@ -56,25 +47,15 @@ import com.github.cliftonlabs.json_simple.JsonException;
  * --gt       the name of a table field followed by a number that the field value must be greater than
  * --in       the name of a table field followed by a list of values of which at least one must match
  */
-public abstract class BasicQueryProcessor extends BaseProcessor {
+public abstract class BasicQueryProcessor extends BaseBvbrcProcessor {
 
     // FIELDS
-    /** logging facility */
-    protected static final Logger log = LoggerFactory.getLogger(BasicQueryProcessor.class);
-    /** BV-BRC cursor connection */
-    private CursorConnection p3;
     /** formatted output field list */
     private String fieldList;
     /** list of filters to use */
     private List<SolrFilter> filters;
-    /** BV-BRC data map */
-    private BvbrcDataMap dataMap;
 
     // COMMAND-LINE OPTIONS
-
-    /** name of the JSON file for the BVBRC data map to use */
-    @Option(name = "--map", metaVar = "dataMap.json", usage = "name of the JSON file for the BVBRC data map to use")
-    private File mapFile;
 
     /** maximum number of results to return */
     @Option(name = "--limit", metaVar = "100",usage = "maximum number of results to return")
@@ -108,10 +89,6 @@ public abstract class BasicQueryProcessor extends BaseProcessor {
     @Option(name = "--in", metaVar = "<fieldName>,<value1>,<value2>,...", usage = "name of a table field followed by a list of values of which at least one must match")
     private List<String> inFilters;
 
-    /** name of the table to query */
-    @Argument(index = 0, metaVar = "tableName", usage = "name of the table to query", required = true)
-    private String tableName;
-
     /** list of fields to return */
     @Argument(index = 1, metaVar = "outField1 outField2 ...", usage = "names of the fields to return", required = true)
     private List<String> outFields;
@@ -119,9 +96,7 @@ public abstract class BasicQueryProcessor extends BaseProcessor {
     // METHODS
 
     @Override
-    final protected void setDefaults() {
-        // If no map file is specified, we use the default map.
-        this.mapFile = null;
+    final protected void setBvbrcDefaults() {
         this.maxResults = P3CursorConnection.MAX_LIMIT;
         // Set up the list-value parameters.
         this.eqFilters = new ArrayList<>();
@@ -142,23 +117,8 @@ public abstract class BasicQueryProcessor extends BaseProcessor {
     protected abstract void setQueryDefaults();
 
     @Override
-    final protected void validateParms() throws IOException, ParseFailureException {
-        // Connect to the database. This requires loading the BV-BRC data map (if any);
-        if (this.mapFile == null) {
-            log.info("Using default BV-BRC data map.");
-            this.p3 = new P3CursorConnection();
-        } else if (! this.mapFile.canRead())
-            throw new FileNotFoundException("BV-BRC data map file not found or unreadable: " + this.mapFile.getAbsolutePath());
-        else {
-            log.info("Using BV-BRC data map from file {}.", this.mapFile);
-            try {
-                this.dataMap = BvbrcDataMap.load(this.mapFile);
-                this.p3 = new CursorConnection(dataMap);
-            } catch (JsonException e) {
-                throw new IOException("Error loading BV-BRC data map file: " + e.toString());
-            }
-        }
-        // Now we have access to the BV-BRC API and the data map is set up. Next, we compile all the
+    final protected void validateBvbrcParms() throws IOException, ParseFailureException {
+        // We have access to the BV-BRC API and the data map is set up. We need to compile all the
         // filters.
         this.filters = new ArrayList<>();
         this.eqFilters.stream().forEach(f -> this.filters.add(processStringFilter(f, x -> SolrFilter.EQ(x[0], x[1]))));
@@ -207,9 +167,9 @@ public abstract class BasicQueryProcessor extends BaseProcessor {
     }
 
     @Override
-    final protected void runCommand() throws Exception {
+    final protected void runBvbrcCommand(CursorConnection p3, String tableName) throws Exception {
         // Run the query and produce the output.
-        this.runQuery(this.p3, this.tableName, this.fieldList, this.filters, this.maxResults);
+        this.runQuery(p3, tableName, this.fieldList, this.filters, this.maxResults);
     }
 
     /**
@@ -233,26 +193,6 @@ public abstract class BasicQueryProcessor extends BaseProcessor {
      */
     protected List<String> getFieldNames() {
         return this.outFields;
-    }
-
-    /**
-     * @return the user-friendly name of the target table's key field
-     */
-    protected String getKeyName() {
-        String retVal;
-        try {
-            retVal = this.dataMap.getTable(this.tableName).getKeyField();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        return retVal;
-    }
-
-    /**
-     * @return the target table name (user-friendly)
-     */
-    protected String getTableName() {
-        return this.tableName;
     }
 
 }

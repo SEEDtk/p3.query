@@ -9,6 +9,7 @@ import org.theseed.basic.BaseProcessor;
  *
  * list		process an input file containing key values and output the query results
  * get      process a single query
+ * fields   list all available fields for a table
  *
  */
 public class App {
@@ -17,6 +18,7 @@ public class App {
     protected static final String[] COMMANDS = new String[] {
              "list", "process an input file containing key values and output the query results",
              "get", "process a single query",
+             "fields", "list all available fields for a table"
     };
 
     public static void main( String[] args ) {
@@ -27,21 +29,14 @@ public class App {
         // Determine the command to process.
         switch (command) {
 
-            case "list" :
-                processor = new QueryListProcessor();
-                break;
+            case "list" -> processor = new QueryListProcessor();
 
-            case "get" :
-                processor = new QueryGetProcessor();
-                break;
+            case "get" -> processor = new QueryGetProcessor();
 
-            case "-h" :
-            case "--help" :
-                processor = null;
-                break;
-                
-            default :
-                throw new RuntimeException("Invalid command " + command + ".");
+            case "fields" -> processor = new FieldListProcessor();
+            
+            case "-h", "--help" -> processor = null;
+            default -> throw new RuntimeException("Invalid command " + command + ".");
         }
         if (processor == null)
             BaseProcessor.showCommands(COMMANDS);

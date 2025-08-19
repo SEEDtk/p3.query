@@ -14,11 +14,14 @@ public class TabTableReporter extends BaseTableReporter {
 
     // FIELDS
     /** output print writer */
-    private PrintWriter writer;
+    private final PrintWriter writer;
 
     public TabTableReporter(IParms processor, File file) throws IOException {
         // Create the print writer.
-        this.writer = new PrintWriter(file);
+        if (file == null)
+            this.writer = new PrintWriter(System.out);
+        else
+            this.writer = new PrintWriter(file);
     }
 
     @Override

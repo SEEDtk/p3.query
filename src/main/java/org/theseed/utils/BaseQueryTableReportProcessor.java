@@ -86,6 +86,7 @@ public abstract class BaseQueryTableReportProcessor extends BasicQueryProcessor 
                 try (PrintWriter testWriter = new PrintWriter(this.outputFile)) {
                     // If we can open the file, we can write to it.
                     log.info("Report will be written to file {}.", this.outputFile);
+                    testWriter.println();
                 }
             } else if (! this.outputFile.canWrite())
                 throw new IOException("Cannot write to output file " + this.outputFile + ".");
