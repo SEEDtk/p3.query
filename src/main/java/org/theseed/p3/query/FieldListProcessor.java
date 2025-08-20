@@ -155,4 +155,22 @@ public class FieldListProcessor extends BaseBvbrcProcessor implements BaseTableR
         }
     }
 
+    @Override
+    public String getIdColIdx() {
+        // FASTA reports are not appropriate for this action, so we punt.
+        return "1";
+    }
+
+    @Override
+    public String getSeqColIdx() {
+        // FASTA reports are not appropriate for this action, so we punt.
+        return "2";
+    }
+
+    @Override
+    public String getCommentColIdxs() {
+        // FASTA reports are not appropriate for this action, so we punt.
+        return "";
+    }
+
 }

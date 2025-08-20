@@ -44,6 +44,15 @@ import org.theseed.reports.BaseTableReporter;
  * --lt       the name of a table field followed by a number that the field value must be less than
  * --gt       the name of a table field followed by a number that the field value must be greater than
  * --in       the name of a table field followed by a list of values of which at least one must match
+ * 
+ * The following parameters modify report output, and are column specs for the output columns. Note that a column spec is 
+ * either a numeric index (1-based) or a column name. A zero index means the last column, and a negative index counts from
+ * the end (so -1 is second-to-last). A column name is case-insensitive, and if an output column header contains periods,
+ * it can match anything after the period.
+ *
+ * --id       the ID column spec for FASTA reports (default "1")
+ * --seq      the sequence column spec for FASTA reports (default "0")
+ * --comment  the comment column specs (comma-delimited) for FASTA reports (default "")
  */
 public abstract class BaseQueryTableReportProcessor extends BasicQueryProcessor implements BaseTableReporter.IParms {
 
@@ -57,12 +66,28 @@ public abstract class BaseQueryTableReportProcessor extends BasicQueryProcessor 
     @Option(name = "--format", usage = "the output format")
     private BaseTableReporter.Type outputFormat;
 
+    /** ID column spec for FASTA reports */
+    @Option(name = "--id", usage = "index (1-based) or name of the ID column for FASTA reports")
+    private String idColSpec;
+
+    /** sequence column spec for FASTA reports */
+    @Option(name = "--seq", usage = "index (1-based) or name of the sequence column for FASTA reports")
+    private String seqColSpec;
+
+    /** comment column specs for FASTA reports */
+    @Option(name = "--comment", usage = "indices (1-based) or names of the comment columns for FASTA reports")
+    private String commentColSpecs;
+
     // METHODS
 
     @Override
     final protected void setQueryDefaults() {
         this.outputFile = null;
         this.outputFormat = BaseTableReporter.Type.TAB;
+        // Set the column specs for FASTA reports.
+        this.idColSpec = "1";
+        this.seqColSpec = "0";
+        this.commentColSpecs = "";
         // Set the subclass defaults.
         this.setQReportDefaults();
     }
@@ -129,5 +154,20 @@ public abstract class BaseQueryTableReportProcessor extends BasicQueryProcessor 
      */
     protected abstract void runQueryReport(BaseTableReporter reporter, CursorConnection p3, String table,
             String fieldString, List<SolrFilter> queryFilters, long limit) throws Exception;
+
+    @Override
+    public String getIdColIdx() {
+        return this.idColSpec;
+    }
+
+    @Override
+    public String getSeqColIdx() {
+        return this.seqColSpec;
+    }
+
+    @Override
+    public String getCommentColIdxs() {
+        return this.commentColSpecs;
+    }
 
 }
