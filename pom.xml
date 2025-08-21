@@ -78,6 +78,11 @@
         <artifactId>basic</artifactId>
         <version>1.0.0</version>
     </dependency>
+    <dependency>
+        <groupId>org.theseed</groupId>
+        <artifactId>excel.utils</artifactId>
+        <version>1.0.0</version>
+    </dependency>
   </dependencies>
 
     <build>
@@ -100,6 +105,16 @@
                                     <mainClass>org.theseed.p3.query.App</mainClass>
                                 </transformer>
                             </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact> <!-- Applies to all dependencies -->
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>

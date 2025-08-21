@@ -36,6 +36,11 @@ public abstract class BaseTableReporter implements AutoCloseable {
          * @return the comment column specs (comma-delimited) for FASTA reports
          */
         String getCommentColIdxs();
+
+        /**
+         * @return the user-friendly name of the table being queried
+         */
+        String getTargetTableName();
     }
 
     /**
@@ -54,6 +59,18 @@ public abstract class BaseTableReporter implements AutoCloseable {
                 return true;
             }
 
+        },
+        /** an Excel spreadsheet */
+        EXCEL {
+            @Override
+            public BaseTableReporter createReporter(IParms processor, File file) throws IOException {
+                return new ExcelTableReporter(processor, file);
+            }
+
+            @Override
+            public boolean supportsStdOut() {
+                return false;
+            }
         },
         /** a FASTA file */
         FASTA {
@@ -112,7 +129,7 @@ public abstract class BaseTableReporter implements AutoCloseable {
      * 
      * @param fields       the list of field values for the row
      */
-    public abstract void writeRow(List<String> fields);
+    public abstract void writeRow(List<Object> fields);
 
     /**
      * Finish the report.

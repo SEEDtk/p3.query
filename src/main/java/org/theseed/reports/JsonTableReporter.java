@@ -1,8 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 package org.theseed.reports;
 
 import java.io.File;
@@ -50,11 +45,14 @@ public class JsonTableReporter extends BaseTableReporter {
     }
 
     @Override
-    public void writeRow(List<String> fields) {
+    public void writeRow(List<Object> fields) {
         // Create a JSON object for the row
         JsonObject jsonRow = new JsonObject();
         for (int i = 0; i < this.colHeaders.size(); i++) {
-            jsonRow.put(this.colHeaders.get(i), fields.get(i));
+            Object obj = fields.get(i);
+            // Convert nulls to an empty string. Everything else is handled by Jsoner.
+            if (obj == null) obj = "";
+            jsonRow.put(this.colHeaders.get(i), obj);
         }
         // Convert the row to a string.
         String jsonString = Jsoner.serialize(jsonRow);

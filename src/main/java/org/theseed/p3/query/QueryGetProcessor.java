@@ -5,7 +5,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.theseed.p3api.CursorConnection;
-import org.theseed.p3api.KeyBuffer;
 import org.theseed.p3api.SolrFilter;
 import org.theseed.reports.BaseTableReporter;
 import org.theseed.utils.BaseQueryTableReportProcessor;
@@ -86,7 +85,7 @@ public class QueryGetProcessor extends BaseQueryTableReportProcessor {
      * @param record    database record to write
      */
     private void writeRowFromRecord(BaseTableReporter reporter, JsonObject record) {
-        List<String> row = this.outputFields.stream().map(x -> KeyBuffer.getString(record, x)).toList();
+        List<Object> row = this.outputFields.stream().map(x -> record.get(x)).toList();
         reporter.writeRow(row);
     }
 

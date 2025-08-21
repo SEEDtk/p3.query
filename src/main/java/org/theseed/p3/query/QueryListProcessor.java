@@ -205,16 +205,16 @@ public class QueryListProcessor extends BaseQueryTableReportProcessor {
         log.info("{} records found for {} keys.", results.size(), lineMap.size());
         // Sort the results by the key name. For each result, we extract the output fields into a list. This will
         // form the second part of each output line. This will hold the sorted results.
-        Map<String, List<List<String>>> resultMap = new HashMap<>(lineMap.size() * 4 / 3 + 1);
+        Map<String, List<List<Object>>> resultMap = new HashMap<>(lineMap.size() * 4 / 3 + 1);
         // We need the field names for the output fields.
         List<String> fieldNames = this.getFieldNames();
         for (JsonObject record : results) {
             // Get the key value from this record.
             String keyValue = KeyBuffer.getString(record, this.keyName);
             // Get the output fields for this record.
-            List<String> row = new ArrayList<>(fieldNames.size());
+            List<Object> row = new ArrayList<>(fieldNames.size());
             for (String fieldName : fieldNames)
-                row.add(KeyBuffer.getString(record, fieldName));
+                row.add(record.get(fieldName));
             // Put the formed line in the sort map.
             resultMap.computeIfAbsent(keyValue, k -> new ArrayList<>()).add(row);
         }
@@ -224,14 +224,14 @@ public class QueryListProcessor extends BaseQueryTableReportProcessor {
             String keyValue = lineEntry.getKey();
             List<String> inputFields = lineEntry.getValue();
             // Get the output lines for this key. Not having any output lines is an acceptable result.
-            List<List<String>> outputLines = resultMap.get(keyValue);
+            List<List<Object>> outputLines = resultMap.get(keyValue);
             if (outputLines == null) {
                 // We have no output lines for this key, so we increment the not found counter.
                 this.keysNotFound++;
             } else {
                 // We have at least one output line. We write the input fields first, then the output fields.
-                for (List<String> outputRow : outputLines) {
-                    List<String> fullRow = new ArrayList<>(inputFields);
+                for (List<Object> outputRow : outputLines) {
+                    List<Object> fullRow = new ArrayList<>(inputFields);
                     fullRow.addAll(outputRow);
                     reporter.writeRow(fullRow);
                     retVal++;

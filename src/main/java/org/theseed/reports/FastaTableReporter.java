@@ -61,12 +61,12 @@ public class FastaTableReporter extends BaseTableReporter {
     }
 
     @Override
-    public void writeRow(List<String> fields) {
+    public void writeRow(List<Object> fields) {
         // Get the ID and sequence.
-        String seqId = fields.get(this.idColIdx);
-        String sequence = fields.get(this.seqColIdx);
+        String seqId = fields.get(this.idColIdx).toString();
+        String sequence = fields.get(this.seqColIdx).toString();
         // Build the comment.
-        String comment = Arrays.stream(commentColIdxs).mapToObj(i -> fields.get(i)).collect(Collectors.joining("\t"));
+        String comment = Arrays.stream(commentColIdxs).mapToObj(i -> fields.get(i).toString()).collect(Collectors.joining("\t"));
         // Form a sequence from the parts.
         Sequence seq = new Sequence(seqId, comment, sequence);
         // Now write the FASTA record.

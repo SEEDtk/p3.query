@@ -135,7 +135,8 @@ No fields are mapped, so we use the internal name for everything. The primary ke
 table from external sources (primary key) is present and unique in every record. The only change is to use the more user-friendly name "contig" instead of
 "genome_sequence".
 
-It is important to remember that mapped fields can be used in filters, but derived fields cannot! They are only available for the output field list!
+It is important to remember that mapped fields can be used in filters, but derived fields cannot! They are only available for the output field list! In
+addition, you cannot used multi-valued fields on either end of a derived-field relationship.
 
 COMMON OPTIONS
 

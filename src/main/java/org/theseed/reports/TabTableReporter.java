@@ -6,6 +6,9 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.TextStringBuilder;
+
+import com.github.cliftonlabs.json_simple.JsonArray;
 
 /**
  * This report object produces a table report as a tab-delimited flat file.
@@ -15,6 +18,8 @@ public class TabTableReporter extends BaseTableReporter {
     // FIELDS
     /** output print writer */
     private final PrintWriter writer;
+    /** delimiter to use for list results */
+    private static final String DELIM = "::";
 
     public TabTableReporter(IParms processor, File file) throws IOException {
         // Create the print writer.
@@ -30,8 +35,33 @@ public class TabTableReporter extends BaseTableReporter {
     }
 
     @Override
-    public void writeRow(List<String> fields) {
-        this.writer.println(StringUtils.join(fields, "\t"));
+    public void writeRow(List<Object> fields) {
+        // Convert all our field values to strings.
+        TextStringBuilder outLine = new TextStringBuilder(fields.size() * 10);
+        for (Object field : fields) {
+            // Add a delimiter if needed.
+            outLine.appendSeparator("\t");
+            // We need to process according to the type of the field.
+            if (field == null) {
+                // This is a null field, so we just append an empty string.
+                outLine.append("");
+            } else if (field instanceof String str) {
+                // This is a string field (the most common), so we append it as-is.
+                outLine.append(str);
+            } else if (field instanceof JsonArray itemList) {
+                // This is a list of items, so we need to join them with double-colons.
+                boolean first = true;
+                for (Object item : itemList) {
+                    if (! first) outLine.append(DELIM);
+                    outLine.append(item.toString());
+                    first = false;
+                }
+            } else {
+                // Here we have a singleton field of unknown type that we convert to a string.
+                outLine.append(field.toString());
+            }
+        }
+        this.writer.println(outLine.toString());
     }
 
     @Override

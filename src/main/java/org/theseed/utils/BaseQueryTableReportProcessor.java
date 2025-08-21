@@ -176,4 +176,9 @@ public abstract class BaseQueryTableReportProcessor extends BasicQueryProcessor 
         return this.commentColSpecs;
     }
 
+    @Override
+    public String getTargetTableName() {
+        return this.getTableName();
+    }
+
 }

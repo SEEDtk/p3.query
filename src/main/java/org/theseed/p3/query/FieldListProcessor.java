@@ -100,7 +100,7 @@ public class FieldListProcessor extends BaseBvbrcProcessor implements BaseTableR
         Set<String> derivedFields = tableInfo.getDerivedFieldNames();
         // We will build the master field list in here so that it comes out in alphabetical order.
         // Each field will be mapped to a list of the report fields.
-        TreeMap<String, List<String>> masterFields = new TreeMap<>();
+        TreeMap<String, List<Object>> masterFields = new TreeMap<>();
         for (Object fieldObject : fields) {
             JsonObject field = (JsonObject) fieldObject;
             String internalName = KeyBuffer.getString(field, "name");
@@ -125,7 +125,7 @@ public class FieldListProcessor extends BaseBvbrcProcessor implements BaseTableR
             }
             if (! skip) {
                 // Here we are keeping the field, so we add its output line to the master map.
-                List<String> outputLine = new ArrayList<>(4);
+                List<Object> outputLine = new ArrayList<>(4);
                 outputLine.add(realName);
                 outputLine.add(internalName);
                 outputLine.add(KeyBuffer.getString(field, "type"));
@@ -136,7 +136,7 @@ public class FieldListProcessor extends BaseBvbrcProcessor implements BaseTableR
         }
         // We've finished all the fields in the record. Now add the derived fields.
         for (String derivedField : derivedFields) {
-            List<String> outputLine = new ArrayList<>(4);
+            List<Object> outputLine = new ArrayList<>(4);
             outputLine.add(derivedField);
             // For the internal name, we use the field description. This requires getting the descriptor itself.
             BvbrcDataMap.IField descriptor = tableInfo.getInternalFieldData(derivedField);
@@ -150,7 +150,7 @@ public class FieldListProcessor extends BaseBvbrcProcessor implements BaseTableR
         // We have a sorted map of field names to output lines. Unroll it into the output file.
         try (BaseTableReporter reporter = this.outputFormat.createReporter(this, this.outputFile)) {
             reporter.setHeaders(Arrays.asList("Field Name", "Internal Name", "Type", "Multi-Valued"));
-            for (List<String> outputLine : masterFields.values())
+            for (List<Object> outputLine : masterFields.values())
                 reporter.writeRow(outputLine);
         }
     }
@@ -171,6 +171,11 @@ public class FieldListProcessor extends BaseBvbrcProcessor implements BaseTableR
     public String getCommentColIdxs() {
         // FASTA reports are not appropriate for this action, so we punt.
         return "";
+    }
+
+    @Override
+    public String getTargetTableName() {
+        return this.getTableName();
     }
 
 }
