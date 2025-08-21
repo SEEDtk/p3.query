@@ -71,17 +71,23 @@ public class QueryGetProcessor extends BaseQueryTableReportProcessor {
         this.outputFields = this.getFieldNames();
         // Set up the output headers.
         reporter.setHeaders(this.outputFields);
-        // Run the query.
+        // Run the query, sending each record found to the reporter.
         log.info("Running query on table {} with fields {} and limit {}.", table, fieldString, limit);
-        List<JsonObject> results = p3.getRecords(table, limit, fieldString, queryFilters);
-        log.info("{} records found.", results.size());
-        // Process the results.
-        for (JsonObject record : results) {
-            List<String> row = this.outputFields.stream().map(x -> KeyBuffer.getString(record, x)).toList();
-            reporter.writeRow(row);
-        }
+        long count = p3.getRecords(table, limit, fieldString, queryFilters, x -> this.writeRowFromRecord(reporter, x));
+        log.info("{} records found.", count);
         // Finish the report.
         reporter.finish();
+    }
+
+    /**
+     * Write the current row to the output.
+     *
+     * @param reporter  output report writer
+     * @param record    database record to write
+     */
+    private void writeRowFromRecord(BaseTableReporter reporter, JsonObject record) {
+        List<String> row = this.outputFields.stream().map(x -> KeyBuffer.getString(record, x)).toList();
+        reporter.writeRow(row);
     }
 
 }
