@@ -9,6 +9,8 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.theseed.basic.ParseFailureException;
 import org.theseed.p3api.CursorConnection;
 import org.theseed.p3api.P3CursorConnection;
@@ -50,6 +52,8 @@ import org.theseed.p3api.SolrFilter;
 public abstract class BasicQueryProcessor extends BaseBvbrcProcessor {
 
     // FIELDS
+    /** logging facility */
+    private static final Logger log = LoggerFactory.getLogger(BasicQueryProcessor.class);
     /** formatted output field list */
     private String fieldList;
     /** list of filters to use */

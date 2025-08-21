@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.kohsuke.args4j.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.theseed.basic.ParseFailureException;
 import org.theseed.io.TabbedLineReader;
 import org.theseed.p3api.CursorConnection;
@@ -64,6 +66,8 @@ import com.github.cliftonlabs.json_simple.JsonObject;
 public class QueryListProcessor extends BaseQueryTableReportProcessor {
 
     // FIELDS
+    /** logging facility */
+    private static final Logger log = LoggerFactory.getLogger(QueryListProcessor.class);
     /** key column index */
     private int keyColIdx;
     /** input file stream */

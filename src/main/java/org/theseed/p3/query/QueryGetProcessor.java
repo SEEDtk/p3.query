@@ -2,6 +2,8 @@ package org.theseed.p3.query;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.theseed.p3api.CursorConnection;
 import org.theseed.p3api.KeyBuffer;
 import org.theseed.p3api.SolrFilter;
@@ -47,6 +49,8 @@ import com.github.cliftonlabs.json_simple.JsonObject;
 public class QueryGetProcessor extends BaseQueryTableReportProcessor {
 
     // FIELDS
+    /** logging facility */
+    private static final Logger log = LoggerFactory.getLogger(QueryGetProcessor.class);
     /** list of output field names, in order */
     private List<String> outputFields;
 

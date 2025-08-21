@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import org.kohsuke.args4j.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.theseed.basic.ParseFailureException;
 import org.theseed.p3api.CursorConnection;
 import org.theseed.p3api.SolrFilter;
@@ -56,6 +58,10 @@ import org.theseed.reports.BaseTableReporter;
  */
 public abstract class BaseQueryTableReportProcessor extends BasicQueryProcessor implements BaseTableReporter.IParms {
 
+    // FIELDS
+    /** logging facility */
+    private static final Logger log = LoggerFactory.getLogger(BaseQueryTableReportProcessor.class);
+    
     // COMMAND-LINE OPTIONS
 
     /** output file for report (if not STDOUT) */

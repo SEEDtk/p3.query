@@ -7,6 +7,8 @@ import java.io.UncheckedIOException;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.theseed.basic.BaseProcessor;
 import org.theseed.basic.ParseFailureException;
 import org.theseed.p3api.BvbrcDataMap;
@@ -32,6 +34,8 @@ import com.github.cliftonlabs.json_simple.JsonException;
 public abstract class BaseBvbrcProcessor extends BaseProcessor {
 
     // FIELDS
+    /** logging facility */
+    private static final Logger log = LoggerFactory.getLogger(BaseBvbrcProcessor.class);
     /** BV-BRC cursor connection */
     private CursorConnection p3;
     /** BV-BRC data map */
