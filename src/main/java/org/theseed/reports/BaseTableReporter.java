@@ -23,7 +23,7 @@ public abstract class BaseTableReporter implements AutoCloseable {
     public static interface IParms {
 
         /**
-         * @return the ID column spec for FASTA reports
+         * @return the ID column spec for FASTA and COUNT reports
          */
         String getIdColIdx();
 
@@ -89,6 +89,18 @@ public abstract class BaseTableReporter implements AutoCloseable {
             @Override
             public BaseTableReporter createReporter(IParms processor, File file) throws IOException {
                 return new JsonTableReporter(processor, file);
+            }
+
+            @Override
+            public boolean supportsStdOut() {
+                return true;
+            }
+        },
+        /** counts for each value in a selected ID field */
+        COUNTS {
+            @Override
+            public BaseTableReporter createReporter(IParms processor, File file) throws IOException {
+                return new CountsTableReporter(processor, file);
             }
 
             @Override

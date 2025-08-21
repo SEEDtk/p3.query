@@ -31,11 +31,6 @@ public class JsonTableReporter extends BaseTableReporter {
     }
 
     @Override
-    public void close() throws Exception {
-        this.writer.close();
-    }
-
-    @Override
     public void setHeaders(List<String> colHeaders) {
         // Save the headers, because we need them to form the JSON objects.
         this.colHeaders = colHeaders;
@@ -72,6 +67,11 @@ public class JsonTableReporter extends BaseTableReporter {
         this.writer.println();
         this.writer.println("]");
         this.writer.flush();
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.writer.close();
     }
 
 }

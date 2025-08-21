@@ -52,7 +52,7 @@ import org.theseed.reports.BaseTableReporter;
  * the end (so -1 is second-to-last). A column name is case-insensitive, and if an output column header contains periods,
  * it can match anything after the period.
  *
- * --id       the ID column spec for FASTA reports (default "1")
+ * --id       the ID column spec for FASTA and COUNT reports (default "1")
  * --seq      the sequence column spec for FASTA reports (default "0")
  * --comment  the comment column specs (comma-delimited) for FASTA reports (default "")
  */
