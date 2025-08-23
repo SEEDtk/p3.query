@@ -161,6 +161,15 @@ different column to key off of, then you can use the "--id" parameter to specify
 
 The "--map" option specifies the data map file, described above.
 
+The "--chunk" option is used to control pacing. Data is passed back from the server in chunks representing a certain number of records, to prevent
+overloading the connection. The defult chunk size is also the maximum-- 25000-- and this works for most tables. For the contig table, however, where
+records could be as large as 4 megabytes, it is best to use a lower value, such as 10 or 20, so that you don't try to download a gigabyte in a single
+query.
+
+The "--messages" option controls progress messages for the data connection. Normally, we attempt to output a progress message every 5 seconds. specify
+a larger number to see less frequent messages, and a smaller number to see more frequent messages. Specify 0 (or a negative value) to turn off
+the progress messages entirely. Progress messages about program activity will still appear.
+
 Finally, the "-v" option (also "--verbose" or "--debug") can be used to get more frequent log messages. This is useful when HTTP errors start cropping up.
 
 FILTER OPTIONS

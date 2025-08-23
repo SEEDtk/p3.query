@@ -30,6 +30,7 @@ import com.github.cliftonlabs.json_simple.JsonException;
  * -v   display more frequent log messages
  * 
  * --map      the name of the JSON file containing the BV-BRC data map (default is to use the default map)
+ * --chunk    the size of the data chunks for each request (default is 25000)
  */
 public abstract class BaseBvbrcProcessor extends BaseProcessor {
 
@@ -47,14 +48,24 @@ public abstract class BaseBvbrcProcessor extends BaseProcessor {
     @Option(name = "--map", metaVar = "dataMap.json", usage = "name of the JSON file for the BVBRC data map to use")
     private File mapFile;
 
+    /** number of seconds to wait between status messages on the log */
+    @Option(name = "--messages", metaVar = "10", usage = "number of seconds between status messages (0 = off)")
+    private int statusMessageInterval;
+
     /** name of the table of interest */
     @Argument(index = 0, metaVar = "tableName", usage = "name of the table to query", required = true)
     private String tableName;
+
+    /** size of the data chunks to process */
+    @Option(name = "--chunk", metaVar = "200", usage = "size of the data chunks to retrieve for each request")
+    private int chunkSize;
 
     // METHODS
 
     @Override
     final protected void setDefaults() {
+        this.statusMessageInterval = 10;
+        this.chunkSize = 25000;
         // If no map file is specified, we use the default map.
         this.mapFile = null;
         // Allow the subclass to set defaults.
@@ -82,8 +93,15 @@ public abstract class BaseBvbrcProcessor extends BaseProcessor {
                 throw new IOException("Error loading BV-BRC data map file: " + e.toString());
             }
         }
+        // Verify the chunk size.
+        if (this.chunkSize < 1)
+            throw new ParseFailureException("Chunk size must be a positive integer.");
+        if (this.chunkSize > 25000)
+            throw new ParseFailureException("Chunk size must not exceed 25000.");
         // Connect to the database.
         this.p3 = new CursorConnection(dataMap);
+        this.p3.setChunkSize(this.chunkSize);
+        this.p3.setMessageGap(this.statusMessageInterval);
         // Insure the table name is valid.
         BvbrcDataMap.Table table = this.dataMap.getTable(this.tableName);
         if (table == null) 
