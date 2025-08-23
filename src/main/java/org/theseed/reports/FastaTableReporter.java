@@ -62,18 +62,27 @@ public class FastaTableReporter extends BaseTableReporter {
 
     @Override
     public void writeRow(List<Object> fields) {
-        // Get the ID and sequence.
-        String seqId = fields.get(this.idColIdx).toString();
-        String sequence = fields.get(this.seqColIdx).toString();
-        // Build the comment.
-        String comment = Arrays.stream(commentColIdxs).mapToObj(i -> fields.get(i).toString()).collect(Collectors.joining("\t"));
-        // Form a sequence from the parts.
-        Sequence seq = new Sequence(seqId, comment, sequence);
-        // Now write the FASTA record.
-        try {
-            this.writer.write(seq);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        // Get the ID and sequence. If the ID is missing or blank, we skip this record.
+        Object id = fields.get(this.idColIdx);
+        if (id != null && StringUtils.isNotBlank(id.toString())) {
+            String seqId = id.toString();
+            // If the sequence is null, we have no sequence.
+            Object seqObject = fields.get(this.seqColIdx);
+            String sequence;
+            if (seqObject == null)
+                sequence = "";
+            else
+                sequence = seqObject.toString();
+            // Build the comment.
+            String comment = Arrays.stream(commentColIdxs).mapToObj(i -> String.valueOf(fields.get(i))).collect(Collectors.joining("\t"));
+            // Form a sequence from the parts.
+            Sequence seq = new Sequence(seqId, comment, sequence);
+            // Now write the FASTA record.
+            try {
+                this.writer.write(seq);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         }
     }
 

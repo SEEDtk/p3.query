@@ -53,12 +53,12 @@ public class TabTableReporter extends BaseTableReporter {
                 boolean first = true;
                 for (Object item : itemList) {
                     if (! first) outLine.append(DELIM);
-                    outLine.append(item.toString());
+                    outLine.append(String.valueOf(item));
                     first = false;
                 }
             } else {
                 // Here we have a singleton field of unknown type that we convert to a string.
-                outLine.append(field.toString());
+                outLine.append(String.valueOf(field));
             }
         }
         this.writer.println(outLine.toString());
