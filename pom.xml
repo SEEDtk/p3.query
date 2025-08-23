@@ -133,6 +133,9 @@
                                 <copy todir="${env.SEED_JARS}">
                                     <fileset dir="${project.build.directory}" includes="${project.build.finalName}.jar" />
                                 </copy>
+                                <copy todir="${project.basedir}/storage">
+                                    <fileset dir="${project.build.directory}" includes="${project.build.finalName}.jar" />
+                                </copy>
                             </target>
                         </configuration>
                     </execution>

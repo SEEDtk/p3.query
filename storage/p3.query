@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+java -Dlogback.configurationFile=<dir>/prod.logback.xml -jar <dir>/p3.query.jar "$@"
