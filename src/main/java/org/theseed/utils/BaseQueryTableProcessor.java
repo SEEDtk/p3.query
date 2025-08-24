@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
-import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +16,11 @@ import org.theseed.p3api.P3CursorConnection;
 import org.theseed.p3api.SolrFilter;
 
 /**
- * This is the base class for BV-BRC query processors. It handles specification of the target table,
- * the output format, the field lists, and the filters.
- * 
- * The positional parameter is the name of the table to query followed by the names ofhe fields to include
+ * This is the base class for BV-BRC query processors. It handles specification of the target table
+ * and the filters but does not consume a field list. The subclass decides which
+ * fields to output.
+ *
+ * The positional parameter is the name of the table to query followed by the names of the fields to include
  * in the output.
  * 
  * The table name and all the field names in the output list and the query filters must be user-friendly
@@ -49,13 +49,11 @@ import org.theseed.p3api.SolrFilter;
  * --gt       the name of a table field followed by a number that the field value must be greater than
  * --in       the name of a table field followed by a list of values of which at least one must match
  */
-public abstract class BasicQueryProcessor extends BaseBvbrcProcessor {
+public abstract class BaseQueryTableProcessor extends BaseBvbrcProcessor {
 
     // FIELDS
     /** logging facility */
-    private static final Logger log = LoggerFactory.getLogger(BasicQueryProcessor.class);
-    /** formatted output field list */
-    private String fieldList;
+    private static final Logger log = LoggerFactory.getLogger(BaseQueryTableProcessor.class);
     /** list of filters to use */
     private List<SolrFilter> filters;
 
@@ -93,10 +91,6 @@ public abstract class BasicQueryProcessor extends BaseBvbrcProcessor {
     @Option(name = "--in", metaVar = "<fieldName>,<value1>,<value2>,...", usage = "name of a table field followed by a list of values of which at least one must match")
     private List<String> inFilters;
 
-    /** list of fields to return */
-    @Argument(index = 1, metaVar = "outField1 outField2 ...", usage = "names of the fields to return", required = true)
-    private List<String> outFields;
-
     // METHODS
 
     @Override
@@ -110,15 +104,14 @@ public abstract class BasicQueryProcessor extends BaseBvbrcProcessor {
         this.ltFilters = new ArrayList<>();
         this.gtFilters = new ArrayList<>();
         this.inFilters = new ArrayList<>();
-        this.outFields = new ArrayList<>();
         // Allow the subclass to set defaults.
-        this.setQueryDefaults();
+        this.setTableDefaults();
     }
 
     /**
      * Specify the default parameters for the subclass.
      */
-    protected abstract void setQueryDefaults();
+    protected abstract void setTableDefaults();
 
     @Override
     final protected void validateBvbrcParms() throws IOException, ParseFailureException {
@@ -143,18 +136,17 @@ public abstract class BasicQueryProcessor extends BaseBvbrcProcessor {
             throw new ParseFailureException("Result limit must be positive.");
         else if (this.maxResults > P3CursorConnection.MAX_LIMIT)
             throw new ParseFailureException("Result limit is too large. The maximum is " + P3CursorConnection.MAX_LIMIT);
-        // Set up the output field list.
-        this.fieldList = String.join(",", this.outFields);
         // Allow the subclass to set additional parameters.
-        this.validateQueryParms();
+        this.validateTableParms();
     }
 
     /**
      * Validate and save the subclass parameters.
+     * 
      * @throws IOException 
      * @throws ParseFailureException 
      */
-    protected abstract void validateQueryParms() throws ParseFailureException, IOException;
+    protected abstract void validateTableParms() throws ParseFailureException, IOException;
 
     /**
      * Convert a string filter parameter to a single SolrFilter object.
@@ -173,7 +165,7 @@ public abstract class BasicQueryProcessor extends BaseBvbrcProcessor {
     @Override
     final protected void runBvbrcCommand(CursorConnection p3, String tableName) throws Exception {
         // Run the query and produce the output.
-        this.runQuery(p3, tableName, this.fieldList, this.filters, this.maxResults);
+        this.runTable(p3, tableName, this.filters, this.maxResults);
     }
 
     /**
@@ -182,21 +174,11 @@ public abstract class BasicQueryProcessor extends BaseBvbrcProcessor {
      * @param p3            connection for processing database queries
      * @param report        the report controller
      * @param table         the name of the table to query
-     * @param fieldString   the comma-delimited field list
      * @param queryFilters  the list of query filters
      * @param limit         the maximum number of results to return
      * 
      * @throws Exception 
      */
-    protected abstract void runQuery(CursorConnection p3, String table, String fieldString, List<SolrFilter> queryFilters, long limit) throws Exception;
-
-    /**
-     * This is a convenience method so the subclass does not have to re-split the output field names.
-     * 
-     * @return the list of field names
-     */
-    protected List<String> getFieldNames() {
-        return this.outFields;
-    }
+    protected abstract void runTable(CursorConnection p3, String table, List<SolrFilter> queryFilters, long limit) throws Exception;
 
 }

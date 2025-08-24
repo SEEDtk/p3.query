@@ -56,7 +56,7 @@ import org.theseed.reports.BaseTableReporter;
  * --seq      the sequence column spec for FASTA reports (default "0")
  * --comment  the comment column specs (comma-delimited) for FASTA reports (default "")
  */
-public abstract class BaseQueryTableReportProcessor extends BasicQueryProcessor implements BaseTableReporter.IParms {
+public abstract class BaseQueryTableReportProcessor extends BaseQueryProcessor implements BaseTableReporter.IParms {
 
     // FIELDS
     /** logging facility */
