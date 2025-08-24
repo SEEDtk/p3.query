@@ -58,7 +58,8 @@ public class TabTableReporter extends BaseTableReporter {
                 }
             } else {
                 // Here we have a singleton field of unknown type that we convert to a string.
-                outLine.append(String.valueOf(field));
+                String string = String.valueOf(field);
+                outLine.append(string);
             }
         }
         this.writer.println(outLine.toString());

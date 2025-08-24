@@ -6,10 +6,17 @@ The basic format of the command is
 
 where
 
-	<action> is the action to take (currently "get" to run a query, "list" to read a file for IDs and run a query for each, or "fields" to list the fields in a table
+	<action> is the action to take
 	<tablename> is the user-friendly name of a database table
-	<field1> <field2> ... <fieldN> are the names of the database fields to display (only for "get" and "list")
+	<field1> <field2> ... <fieldN> are the names of the database fields to display (not used for "fields")
 	<options> are various command-line options that depend on the action
+
+The currently-supported actions are
+
+	fields		list the fields of a table
+	get			execute a query against a table
+	list		read values from an input file and use them to query a table
+	pipe		execute a query against one table and use the results to query a second
 
 The "--help" option will display the command-line usage for each action, so
 
@@ -140,7 +147,7 @@ addition, you cannot used multi-valued fields on either end of a derived-field r
 
 COMMON OPTIONS
 
-Several options are common to all three commands. First and foremost, the commands produce output in the form of a tabular report on the standard output. The
+Several options are common to all commands. First and foremost, the commands produce output in the form of a tabular report on the standard output. The
 "--output" or "-o" option can be used to specify an alternative output file. The format of the report is specifed using the "--format" option. The default
 format is TAB, which is a tab-delimited file with headers. You can also specify JSON as the format, in which case the output will be a JSON list, FASTA,
 which outputs a FASTA file, COUNTS which counts the values in a particular column, and EXCEL which outputs an Excel workbook.
@@ -174,8 +181,8 @@ Finally, the "-v" option (also "--verbose" or "--debug") can be used to get more
 
 FILTER OPTIONS
 
-The "get" and "list" commands allow you to specify filters using command options. The parameter of a filter option is a user-friendly field name followed
-by one or more values, comma-delimited. (Only the "--in" filter currently allows multiple values.) There are three text filters
+The "get", "pipe", and "list" commands allow you to specify filters using command options. The parameter of a filter option is a user-friendly field name
+followed by one or more values, comma-delimited. (Only the "--in" filter currently allows multiple values.) There are three text filters
 
 	--in	the specified field should match at least one of the specified values
 	--eq	the specified field should match the specified value
@@ -205,7 +212,7 @@ relations.
 
 QUERY MODIFICATION OPTIONS
 
-Like the filter options, the query modification options are common to the "get" and "list" actions. Currently, the only one is "--limit". This specifies
+Like the filter options, the query modification options are common to the "get", "pipe", and "list" actions. Currently, the only one is "--limit". This specifies
 the maxmimum number of records that can be returned. The default is a staggering 4 billion. Currently, the "get" option will run out of memory if you
 go even remotely close to that number, but we are working on it.
 
@@ -276,6 +283,10 @@ This command takes as input a list of PATRIC feature IDs and outputs the annotat
 the batch size to 1000. There is no need to specify "--key" since we are using the primary key.
 
 	p3.query list feature product na_sequence --batch 1000 > dna.tbl
+
+PIPE ACTION
+
+
 
 CONTACT ME
 

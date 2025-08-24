@@ -25,7 +25,7 @@ import org.theseed.basic.ParseFailureException;
  * 
  * The GET thread's processing class inherits BaseQueryProcessor. The LIST thread's processing class
  * inherits BaseQueryTableProcessor. We parse our command-line parameters and options and separate them
- * into two sets, depending on whether they are before or after a special "->" divider. The parameters
+ * into two sets, depending on whether they are before or after a special "==" divider. The parameters
  * before are passed to the GET thread, and the parameters after are passed to the LIST thread. The
  * exceptions are the "-v"/"--verbose", "--messages", and "--map", which are passed to both as a convenience.
  *
@@ -68,10 +68,10 @@ public class QueryPipeProcessor implements ICommand {
                 if (arg.equals("-h") || arg.equals("--help")) {
                     // Here we short-circuit everything and print usage.
                     this.printUsageAndExit(0);
-                } else if (arg.equals("->")) {
+                } else if (arg.equals("==")) {
                     // Switch to LIST mode, but complain if this is our second arrow.
                     if (target == this.listParams)
-                        throw new IllegalArgumentException("Only one '->' allowed in pipe command.");
+                        throw new IllegalArgumentException("Only one '==' allowed in pipe command.");
                     target = this.listParams;
                 } else if (BOTH_OPTIONS.contains(arg)) {
                     // These options apply to both queries. The option and its value are added to both parameter lists.
@@ -109,7 +109,7 @@ public class QueryPipeProcessor implements ICommand {
      */
     private void printUsageAndExit(int code) {
         // We display a quick message, then display the usages of the two parameter parts.
-        System.err.println("<get-parameters> -> <list-parameters>");
+        System.err.println("<get-parameters> == <list-parameters>");
         System.err.println("NOTE: the following options are automatically passed to both: " + StringUtils.join(BOTH_OPTIONS, ' '));
         System.err.println("USAGE for <get-parameters>");
         this.getRunner.printUsage();

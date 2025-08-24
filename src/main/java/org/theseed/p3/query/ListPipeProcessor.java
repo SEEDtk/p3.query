@@ -98,6 +98,7 @@ public class ListPipeProcessor extends BaseQueryTableReportProcessor {
             // Skip this batch if we have exhausted the output limit.
             if (rowsLeft > 0) {
                 // Query the current batch.
+                log.info("Processing batch of {} records.", this.currentBatch.size());
                 List<JsonObject> records = p3.getRecords(table, rowsLeft, this.currentBatch.size(), keyName, currentBatch, fieldString, queryFilters);
                 // Update the rows-left count.
                 long count = records.size();
@@ -112,6 +113,7 @@ public class ListPipeProcessor extends BaseQueryTableReportProcessor {
                 }
             }
         }
+        log.info("All batches processed.");
     }
 
     /**

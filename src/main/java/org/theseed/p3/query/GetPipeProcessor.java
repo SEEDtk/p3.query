@@ -63,7 +63,7 @@ public class GetPipeProcessor extends BaseQueryTableProcessor {
     private int batchSize;
 
     /** table field to pass to list processor */
-    @Argument(index = 0, metaVar = "tableField", usage = "name of the table field to pass to the list processor", required = true)
+    @Argument(index = 1, metaVar = "tableField", usage = "name of the table field to pass to the list processor", required = true)
     private String tableField;
 
     @Override
@@ -81,15 +81,19 @@ public class GetPipeProcessor extends BaseQueryTableProcessor {
 
     @Override
     protected void runTable(CursorConnection p3, String table, List<SolrFilter> queryFilters, long limit) throws Exception {
-        // Compute the field list for the query. It consists only of the output field.
-        long count = p3.getRecords(table, limit, this.tableField, queryFilters, (x -> this.processRecord(x)));
-        log.info("{} records found.", count);
-        // Process the residual batch.
-        if (! this.currentBatch.isEmpty()) {
-            this.sendBatch();
+        try {
+            // Compute the field list for the query. It consists only of the output field.
+            long count = p3.getRecords(table, limit, this.tableField, queryFilters, (x -> this.processRecord(x)));
+            log.info("{} records found.", count);
+            // Process the residual batch.
+            if (! this.currentBatch.isEmpty()) {
+                this.sendBatch();
+            }
+        } finally {
+            // Terminate the LIST processor by sending an empty list. We do this
+            // here so that we kill the list processor if we error out.
+            this.resultQueue.put(TERMINATING_BATCH);
         }
-        // Terminate the LIST processor by sending an empty list.
-        this.resultQueue.put(TERMINATING_BATCH);
     }
         
     /**
@@ -101,11 +105,12 @@ public class GetPipeProcessor extends BaseQueryTableProcessor {
     private void processRecord(JsonObject record) {
         // Insure there is room in the current batch.
         if (this.currentBatch.size() >= this.batchSize) {
+            log.info("Sending batch of {} records to LIST processor.", this.currentBatch.size());
             this.sendBatch();
             // Create a new batch.
             this.currentBatch = new ArrayList<>(this.batchSize);
         }
-        // Add the key to the 
+        // Now that we have room for it, add the key to the batch.
         String key = KeyBuffer.getString(record, this.tableField);
         this.currentBatch.add(key);
     }
