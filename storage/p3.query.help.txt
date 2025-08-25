@@ -286,7 +286,31 @@ the batch size to 1000. There is no need to specify "--key" since we are using t
 
 PIPE ACTION
 
+Occasionally, you need to filter by fields in one table and then output fields in another. Typically, this involves getting features for particular
+genomes. For example, say you want tRNA features from genomes in the "Bacillaceae" family. Family data is not available in the feature table, so
+you need to get genome IDs from the genome table (a GET action) and then feed those genome IDs to a LIST action against the feature table. The "pipe"
+action performs the two steps at once, in parallel.
 
+The pipe action needs two sets of parameters, one for each step of the pipe. For convenience, some of the command-line options (--verbose/-v, --map,
+and --messages) are automatically passed to both steps. Otherwise, the string "==" is used as a divider. Everything before the divider is sent to
+the GET step and everything after to the LIST step.
+
+Both steps require that the first positional parameter be the user-friendly table name. For GET, there is one additional positional parameter, which
+is the user-friendly name of the table field containing the keys to be passed to the LIST step. In addition, the "-b"/"--batch" option can be used
+to specify the number of records to send to the LIST step in each batch. The remaining command-line options are the filters, "--chunk", and "--limit".
+
+The LIST step's positional parameters are the user-friendly table name followed by the list of output fields. In addition, it supports the filters,
+"--chunk", and "--limit", and the "--format" option for the output format. The output will be put on the standard output, but this can be
+overridden by "-"/"--output". The "--key" option specifies the key field of the LIST step's query table. The default for this is the primary
+key (which is almost always wrong). As with the "list" action, the LIST step of the pipe option accepts the report-modification parameters "--id",
+"--seq", and "--comment".
+
+So, the following command outputs all the tRNA genomes from the Bacillaceae family.
+
+	p3.query pipe genome genome_id --eq family,Bacillaceae == feature patric_id product --eq feature_type,tRNA --eq annotation,PATRIC --key genome_id
+
+Note that we have to specify "--key genome_id" in the LIST step to insure the genome IDs from the GET step are matched to the genome IDs of the
+feature records.
 
 CONTACT ME
 
