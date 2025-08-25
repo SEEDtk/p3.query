@@ -90,11 +90,16 @@ and pull the corresponding sequence from the "sequence" field of the "feature_se
 sequences for features without having to know about the extra table lookup involved. p3.query does this lookup automatically. It even batches
 the lookups for greater efficiency.
 
+Finally, the data map allows you to specify required filters for a table. Only "ne" and "eq" filters are supported. The requirements are specified
+as a list value for the "requirements" field. Each object in the list is a hash: "op" specified the operator ("eq" or "ne"), and "value"
+specifies the filter text, which is a user-friendly field name, a comma, and a comparison operand. Typically, this is used on the feature table
+to prevent non-PATRIC features from appearing in the output.
+
 The data map is a hash of table objects. The hash key is the user-friendly table name. Each table object has the following fields
 
-	name		the internal name of the table
+	name	the internal name of the table
 	key		the internal name of the primary key of the table
-	sort		the internal name of the database's ID field for the table
+	sort	the internal name of the database's ID field for the table
 	map		the field mapping
 
 The field mapping is a hash keyed by user-friendly name. The value is normally the field's internal name. For a derived field (that is,
@@ -110,6 +115,7 @@ For example, here is a table object for the "genome_feature" table
 		"name": "genome_feature",
 		"key": "patric_id",
 		"sort": "feature_id",
+		"requirements" [ { op: "eq", value: "feature_id,*" } ],
 		"map": {
 			"feature_id":"patric_id",
 			"annotation_source":"annotation",
@@ -128,6 +134,8 @@ field, we must use "annotation_source".
 
 There are two derived fields, both in the "sequence" table (which is elsewhere mapped to "feature_sequence". The "aa_sequence_md5" field contains the sequence key for
 the protein, and "na_sequence_md5" contains the sequence key for the DNA. In both cases, the actual sequence is stored in the "feature_sequence" table's "sequence" field.
+
+The requirement indicates that each feature must have a non-blank feature ID.
 
 Here is a much simpler table object for the "genome_sequence" table.
 
@@ -198,9 +206,9 @@ or "Streptococcus and pyogenes".
 
 Use "*" by itself in the "--eq" filter to match any nonblank value. Thus
 
-	--eq feature_id,*
+	--eq aa_sequence_md5,*
 
-will match any record with a non-empty feature ID.
+will match any record with a protein sequence.
 
 There are four numeric filter options. Each specifies a user-friendly field name, a comma, and a single number. The options name the standard inequality
 relations.
@@ -241,7 +249,7 @@ The following command gets the ID, length, and DNA sequence of all rRNA features
 The following command creates a FASTA file of all the protein sequences in PATRIC-annotated features of the genome "100226.11". The comment column will contain
 the annotation itself.
 
-	p3.query get feature patric_id product aa_sequence --eq annotation,PATRIC --eq genome_id,100226.11 --eq feature_type,CDS --format FASTA --comment product > Streptomyces.faa
+	p3.query get feature patric_id product aa_sequence --eq genome_id,100226.11 --eq feature_type,CDS --format FASTA --comment product > Streptomyces.faa
 
 LIST ACTION
 
@@ -307,7 +315,7 @@ key (which is almost always wrong). As with the "list" action, the LIST step of 
 
 So, the following command outputs all the tRNA genomes from the Bacillaceae family.
 
-	p3.query pipe genome genome_id --eq family,Bacillaceae == feature patric_id product --eq feature_type,tRNA --eq annotation,PATRIC --key genome_id
+	p3.query pipe genome genome_id --eq family,Bacillaceae == feature patric_id product --eq feature_type,tRNA --key genome_id
 
 Note that we have to specify "--key genome_id" in the LIST step to insure the genome IDs from the GET step are matched to the genome IDs of the
 feature records.
