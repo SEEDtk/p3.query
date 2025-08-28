@@ -14,6 +14,7 @@ where
 The currently-supported actions are
 
 	fields		list the fields of a table
+	tables		list the tables in the specified data map
 	get			execute a query against a table
 	list		read values from an input file and use them to query a table
 	pipe		execute a query against one table and use the results to query a second
