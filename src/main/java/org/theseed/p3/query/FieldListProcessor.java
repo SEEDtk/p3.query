@@ -18,7 +18,7 @@ import org.theseed.p3api.BvbrcDataMap;
 import org.theseed.p3api.CursorConnection;
 import org.theseed.p3api.KeyBuffer;
 import org.theseed.reports.BaseTableReporter;
-import org.theseed.utils.BaseBvbrcProcessor;
+import org.theseed.utils.BaseTableProcessor;
 
 import com.github.cliftonlabs.json_simple.JsonArray;
 import com.github.cliftonlabs.json_simple.JsonObject;
@@ -41,7 +41,7 @@ import com.github.cliftonlabs.json_simple.JsonObject;
  * --format   output report format (default is TAB)
  * 
  */
-public class FieldListProcessor extends BaseBvbrcProcessor implements BaseTableReporter.IParms {
+public class FieldListProcessor extends BaseTableProcessor implements BaseTableReporter.IParms {
 
     // FIELDS
     /** logging facility */

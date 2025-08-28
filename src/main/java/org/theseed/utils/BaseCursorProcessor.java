@@ -3,9 +3,7 @@ package org.theseed.utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 
-import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +18,7 @@ import com.github.cliftonlabs.json_simple.JsonException;
  * This is the base class for BV-BRC database processors. It handles connection to the
  * BV-BRC database and provides common parameters for mapping.
  *
- * The positional parameter is the name of the table to query.
+ * There are no positional parameters at this level of the class hierarchy.
  *
  * The table name must be a user-friendly name according to the selected BV-BRC data map.
  * 
@@ -32,11 +30,11 @@ import com.github.cliftonlabs.json_simple.JsonException;
  * --map      the name of the JSON file containing the BV-BRC data map (default is to use the default map)
  * --chunk    the size of the data chunks for each request (default is 25000)
  */
-public abstract class BaseBvbrcProcessor extends BaseProcessor {
+public abstract class BaseCursorProcessor extends BaseProcessor {
 
     // FIELDS
     /** logging facility */
-    private static final Logger log = LoggerFactory.getLogger(BaseBvbrcProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(BaseCursorProcessor.class);
     /** BV-BRC cursor connection */
     private CursorConnection p3;
     /** BV-BRC data map */
@@ -52,10 +50,6 @@ public abstract class BaseBvbrcProcessor extends BaseProcessor {
     @Option(name = "--messages", metaVar = "10", usage = "number of seconds between status messages (0 = off)")
     private int statusMessageInterval;
 
-    /** name of the table of interest */
-    @Argument(index = 0, metaVar = "tableName", usage = "name of the table to query", required = true)
-    private String tableName;
-
     /** size of the data chunks to process */
     @Option(name = "--chunk", metaVar = "200", usage = "size of the data chunks to retrieve for each request")
     private int chunkSize;
@@ -69,13 +63,13 @@ public abstract class BaseBvbrcProcessor extends BaseProcessor {
         // If no map file is specified, we use the default map.
         this.mapFile = null;
         // Allow the subclass to set defaults.
-        this.setBvbrcDefaults();
+        this.setCursorDefaults();
     }
 
     /**
      * Specify the default parameters for the subclass.
      */
-    protected abstract void setBvbrcDefaults();
+    protected abstract void setCursorDefaults();
 
     @Override
     final protected void validateParms() throws IOException, ParseFailureException {
@@ -102,73 +96,40 @@ public abstract class BaseBvbrcProcessor extends BaseProcessor {
         this.p3 = new CursorConnection(dataMap);
         this.p3.setChunkSize(this.chunkSize);
         this.p3.setMessageGap(this.statusMessageInterval);
-        // Insure the table name is valid.
-        BvbrcDataMap.Table table = this.dataMap.getTable(this.tableName);
-        if (table == null) 
-            throw new ParseFailureException("Unknown table: " + this.tableName);
         // Allow the subclass to set additional parameters.
-        this.validateBvbrcParms();
+        this.validateCursorParms(this.p3);
     }
 
     /**
      * Validate and save the subclass parameters.
      * 
+     * @param p3    the cursor connection to validate
+     * 
      * @throws IOException 
      * @throws ParseFailureException 
      */
-    protected abstract void validateBvbrcParms() throws ParseFailureException, IOException;
+    protected abstract void validateCursorParms(CursorConnection p3) throws ParseFailureException, IOException;
 
     @Override
     final protected void runCommand() throws Exception {
         // Run the query and produce the output.
-        this.runBvbrcCommand(this.p3, this.tableName);
+        this.runCursorCommand(this.p3);
     }
 
     /**
      * Run the appropriate query to get the desired results.
      * 
      * @param p3            connection for processing database queries
-     * @param report        the report controller
-     * @param table         the name of the table to query
-     * @param fieldString   the comma-delimited field list
-     * @param queryFilters  the list of query filters
-     * @param limit         the maximum number of results to return
      * 
      * @throws Exception 
      */
-    protected abstract void runBvbrcCommand(CursorConnection p3, String table) throws Exception;
+    protected abstract void runCursorCommand(CursorConnection p3) throws Exception;
 
     /**
-     * @return the user-friendly name of the target table's key field
+     * @return the BV-BRC data map
      */
-    protected String getKeyName() {
-        String retVal;
-        try {
-            retVal = this.dataMap.getTable(this.tableName).getKeyField();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        return retVal;
-    }
-
-    /**
-     * @return the target table name (user-friendly)
-     */
-    protected String getTableName() {
-        return this.tableName;
-    }
-
-    /**
-     * @return the data map for the target table
-     */
-    protected BvbrcDataMap.Table getTableMap() {
-        BvbrcDataMap.Table retVal;
-        try {
-            retVal = this.dataMap.getTable(this.tableName);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        return retVal;
+    protected BvbrcDataMap getDataMap() {
+        return this.dataMap;
     }
 
 }

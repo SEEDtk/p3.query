@@ -12,6 +12,7 @@ import org.theseed.basic.ICommand;
  * get      process a single query
  * fields   list all available fields for a table
  * pipe     process a get query that feeds into a list query
+ * tables   list all available tables
  *
  */
 public class App {
@@ -21,7 +22,8 @@ public class App {
              "list", "process an input file containing key values and output the query results",
              "get", "process a single query",
              "fields", "list all available fields for a table",
-             "pipe", "process a get query that feeds into a list query"
+             "pipe", "process a get query that feeds into a list query",
+             "tables", "list all available tables"
     };
 
     public static void main( String[] args ) {
@@ -39,7 +41,9 @@ public class App {
             case "fields" -> processor = new FieldListProcessor();
 
             case "pipe" -> processor = new QueryPipeProcessor();
-            
+
+            case "tables" -> processor = new TableListProcessor();
+
             case "-h", "--help" -> processor = null;
             default -> throw new RuntimeException("Invalid command " + command + ".");
         }

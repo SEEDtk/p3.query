@@ -49,7 +49,7 @@ import org.theseed.p3api.SolrFilter;
  * --gt       the name of a table field followed by a number that the field value must be greater than
  * --in       the name of a table field followed by a list of values of which at least one must match
  */
-public abstract class BaseQueryTableProcessor extends BaseBvbrcProcessor {
+public abstract class BaseQueryTableProcessor extends BaseTableProcessor {
 
     // FIELDS
     /** logging facility */
