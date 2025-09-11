@@ -58,13 +58,15 @@ public class TableListProcessor extends BaseCursorProcessor implements BaseTable
     protected void runCursorCommand(CursorConnection p3) throws Exception {
         try {
             // We have two output columns-- user-friendly name and internal name.
-            this.reportWriter.setHeaders(Arrays.asList("User-Friendly Name", "Internal Name"));
+            this.reportWriter.setHeaders(Arrays.asList("User-Friendly Name", "Internal Name", "Key Field"));
             // Get the data map.
             BvbrcDataMap dataMap = this.getDataMap();
             for (var entry : dataMap) {
                 String tableName = entry.getKey();
-                String internalName = entry.getValue().getInternalName();
-                this.reportWriter.writeRow(Arrays.asList(tableName, internalName));
+                BvbrcDataMap.Table info = entry.getValue();
+                String internalName = info.getInternalName();
+                String keyName = info.getKeyField();
+                this.reportWriter.writeRow(Arrays.asList(tableName, internalName, keyName));
             }
         } finally {
             this.reportWriter.close();
