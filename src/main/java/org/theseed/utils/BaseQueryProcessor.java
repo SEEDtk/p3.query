@@ -1,7 +1,9 @@
 package org.theseed.utils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+
 import org.kohsuke.args4j.Argument;
 import org.theseed.basic.ParseFailureException;
 import org.theseed.p3api.CursorConnection;
@@ -55,6 +57,8 @@ public abstract class BaseQueryProcessor extends BaseQueryTableProcessor {
 
     @Override
     final protected void setTableDefaults() {
+        // Clear the field list.
+        this.outFields = new ArrayList<>();
         // Allow the subclass to set defaults.
         this.setQueryDefaults();
     }
