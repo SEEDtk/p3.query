@@ -157,8 +157,8 @@ public abstract class BaseQueryTableProcessor extends BaseTableProcessor {
      * @return the corresponding SolrFilter object
      */
     private SolrFilter processStringFilter(String filter, Function<String[], SolrFilter> function) {
-        String[] pieces = StringUtils.split(filter, ',');
-        if (pieces.length != 2) throw new IllegalArgumentException("Invalid filter format: " + filter);
+        String[] pieces = StringUtils.split(filter, ",", 2);
+        if (pieces.length < 2) throw new IllegalArgumentException("Invalid filter format: " + filter);
         return function.apply(pieces);
     }
 
