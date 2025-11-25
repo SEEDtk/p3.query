@@ -222,8 +222,7 @@ relations.
 QUERY MODIFICATION OPTIONS
 
 Like the filter options, the query modification options are common to the "get", "pipe", and "list" actions. Currently, the only one is "--limit". This specifies
-the maxmimum number of records that can be returned. The default is a staggering 4 billion. Currently, the "get" option will run out of memory if you
-go even remotely close to that number, but we are working on it.
+the maxmimum number of records that can be returned. The default is a staggering 4 billion. 
 
 FIELDS ACTION
 
@@ -265,7 +264,7 @@ options.
 The "-b" option is tuned for performance. If you expect each ID to produce a lot of records, then you want to reduce it to a small number. If you expect each
 ID to produce a small number of records, you can make it bigger. The default is 200.
 
-The "list" action read all of the records for a batch into memory so that it can associate input records with output data. This could cause a problem
+The "list" action reads all of the records for a batch into memory so that it can associate input records with output data. This could cause a problem
 if too many records are associated with each input key. If that happens, reduce the batch size. Note that the "get" action does not have this problem,
 as it processes records in chunks, and each chunk has a maximum size.
 
