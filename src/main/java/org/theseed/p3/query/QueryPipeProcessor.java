@@ -58,6 +58,10 @@ public class QueryPipeProcessor implements ICommand {
         // Create the two handlers.
         this.getRunner = new GetPipeProcessor();
         this.listRunner = new ListPipeProcessor();
+        // Insure the parameter lists are empty. This is only necessary if we are reusing the same processor for multiple runs,
+        // which does happen when we are called as a subroutine.
+        this.getParams.clear();
+        this.listParams.clear();
         // If an error occurs, we want to catch it and print usage.
         try {
             // Loop through the parameters. Start us in GET mode.
