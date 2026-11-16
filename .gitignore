@@ -2,3 +2,4 @@
 /data/*.ser
 dependency-reduced-pom.xml
 /storage/*.jar
+deps.txt
